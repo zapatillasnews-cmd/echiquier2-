@@ -1,70 +1,89 @@
 import { Chess } from 'chess.js'
 import { InteractiveBoard } from '../ui/board.js'
 import { PgnTree } from '../chess/PgnTree.js'
-import { isSupabaseConfigured, createStudy, saveStudy } from '../supabase.js'
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
-
-// Notation francaise pour l'affichage de l'arbre.
 const FR = { K: 'R', Q: 'D', R: 'T', B: 'F', N: 'C' }
 const frSan = (san) => String(san).replace(/[KQRBN]/g, (c) => FR[c])
 
-// Jeu libre + ENREGISTREMENT : tu joues, tu crees des variantes (reviens en
-// arriere et joue un autre coup), tu les nommes, tu sauvegardes en Etude.
+// Bibliotheque locale d'ouvertures (localStorage).
+const LIB = 'my_openings_v1'
+const loadLib = () => { try { return JSON.parse(localStorage.getItem(LIB) || '[]') } catch { return [] } }
+const saveLib = (a) => localStorage.setItem(LIB, JSON.stringify(a))
+
+// Jouer : on joue, on enregistre des ouvertures + variantes, on rejoue.
 export function renderPlay(container, navigate) {
-  const tree = new PgnTree()
+  let tree = new PgnTree()
   let currentId = tree.rootId
+  let mode = 'edit'      // 'edit' = on joue ; 'replay' = navigation seule
+  let libOpen = false
 
   container.innerHTML = `
     <div class="row" style="justify-content:space-between;align-items:center">
       <h1 style="margin:0">Échiquier</h1>
       <div class="row">
-        <button class="btn secondary btn-sm" id="flip">Retourner</button>
-        <button class="btn secondary btn-sm" id="reset">Vider</button>
+        <button class="btn secondary btn-sm" id="lib">📂 Mes ouvertures</button>
+        <button class="btn secondary btn-sm" id="flip">⟲</button>
       </div>
     </div>
-    <p class="muted" style="margin:6px 0 14px">Joue tes coups. Pour créer une <b>variante</b>, reviens à un coup précédent (clique-le dans l'arbre) et joue un autre coup.</p>
 
-    <div class="board-layout">
+    <div class="board-layout" style="margin-top:12px">
       <div>
         <div class="board-wrap"><div class="cg-wrap" id="board"></div></div>
-        <div class="row" style="margin-top:10px">
-          <button class="btn secondary" id="first">|◀</button>
-          <button class="btn secondary" id="prev">◀</button>
-          <button class="btn secondary" id="next">▶</button>
-          <button class="btn secondary" id="last">▶|</button>
+
+        <div class="play-actions" id="actions">
+          <button class="btn secondary" id="reset">🔄 Reset</button>
+          <button class="btn secondary" id="rejouer">⏯ Rejouer</button>
+          <button class="btn secondary" id="variante">🌿 Variante</button>
+          <button class="btn" id="ouverture">💾 Ouverture</button>
         </div>
-        <p class="muted" id="status" style="margin-top:10px"></p>
+
+        <div class="replay-bar" id="replaybar" hidden>
+          <button class="btn secondary btn-sm" id="first">|◀</button>
+          <button class="btn secondary btn-sm" id="prev">◀</button>
+          <span class="counter" id="counter">0/0 coups</span>
+          <button class="btn secondary btn-sm" id="next">▶</button>
+          <button class="btn secondary btn-sm" id="last">▶|</button>
+          <button class="btn btn-sm" id="playhere">▶ Jouer depuis ici</button>
+        </div>
+
+        <p class="muted" id="status" style="margin-top:10px;text-align:center"></p>
       </div>
 
       <div class="sidebar">
-        <div class="card" id="nodepanel"></div>
-        <div class="card">
-          <div class="row" style="justify-content:space-between">
-            <h2 style="margin:0">Arbre de coups</h2>
-            ${isSupabaseConfigured ? '<button class="btn btn-sm" id="save">💾 Enregistrer en Étude</button>' : ''}
-          </div>
-          <div class="tree" id="tree" style="margin-top:8px"></div>
-          <span id="savemsg" class="muted"></span>
+        <div class="card" id="libcard" hidden>
+          <div class="row" style="justify-content:space-between"><h2 style="margin:0">Mes ouvertures</h2><button class="btn secondary btn-sm" id="libclose">✕</button></div>
+          <div id="liblist" style="margin-top:10px"></div>
         </div>
+
+        <div class="card">
+          <h2 style="margin:0 0 8px">Coups & variantes</h2>
+          <div class="tree" id="tree"></div>
+          <div id="nodetools"></div>
+        </div>
+
         <div class="card">
           <div class="row" style="justify-content:space-between;align-items:center">
             <h2 style="margin:0">FEN</h2>
             <button class="btn secondary btn-sm" id="copyfen">Copier</button>
           </div>
-          <input id="fen" readonly style="margin-top:6px;font-family:ui-monospace,monospace;font-size:0.8rem" />
+          <input id="fen" readonly style="margin-top:6px;font-family:ui-monospace,monospace;font-size:0.78rem" />
           <p class="muted" style="margin-top:8px">La FEN est une « photo » de la position en une ligne de texte : copie-la pour sauvegarder ou partager une position exacte.</p>
         </div>
       </div>
     </div>`
 
   const board = new InteractiveBoard(container.querySelector('#board'), { orientation: 'white', onMove: handleMove })
-  const treeEl = container.querySelector('#tree')
-  const panelEl = container.querySelector('#nodepanel')
-  const statusEl = container.querySelector('#status')
-  const fenEl = container.querySelector('#fen')
+  const $ = (s) => container.querySelector(s)
+  const treeEl = $('#tree'), statusEl = $('#status'), fenEl = $('#fen')
+  const replayBar = $('#replaybar'), counterEl = $('#counter'), nodeTools = $('#nodetools')
+
+  function hasMoves() { return tree.nodes[tree.rootId].children.length > 0 }
+  function plyOf(id) { let n = 0, c = id; while (tree.get(c) && tree.get(c).parentId) { c = tree.get(c).parentId; n++ } return n }
+  function lineTotal(id) { let n = plyOf(id), c = id; while (tree.childMainline(c)) { c = tree.childMainline(c); n++ } return n }
 
   function handleMove(orig, dest) {
+    if (mode !== 'edit') { refresh(); return }
     const node = tree.get(currentId)
     const chess = new Chess(node.fen)
     let move = null
@@ -75,19 +94,19 @@ export function renderPlay(container, navigate) {
   }
 
   function go(id) { if (id && tree.get(id)) { currentId = id; refresh() } }
-  function gotoLast() {
-    let id = currentId
-    while (tree.childMainline(id)) id = tree.childMainline(id)
-    go(id)
-  }
 
   function refresh() {
     const node = tree.get(currentId)
     board.setFen(node.fen, [node.from, node.to])
+    board.setViewOnly(mode === 'replay')
     fenEl.value = node.fen
     updateStatus(node.fen)
+    counterEl.textContent = `${plyOf(currentId)}/${lineTotal(currentId)} coups`
+    replayBar.hidden = mode !== 'replay'
+    // boutons actifs seulement s'il y a des coups
+    ;['rejouer', 'variante', 'ouverture'].forEach((id) => { $('#' + id).disabled = !hasMoves() })
     renderTree()
-    renderPanel()
+    renderNodeTools()
   }
 
   function updateStatus(fen) {
@@ -99,10 +118,9 @@ export function renderPlay(container, navigate) {
     else statusEl.textContent = c.turn() === 'w' ? 'Trait aux Blancs' : 'Trait aux Noirs'
   }
 
-  // --- arbre cliquable (ligne principale + variantes entre parentheses) ---
+  // --- arbre cliquable ---
   function numLabel(node, forceBlack) {
-    const parts = node.fen.split(' ')
-    const turn = parts[1], full = parseInt(parts[5], 10)
+    const parts = node.fen.split(' '); const turn = parts[1], full = parseInt(parts[5], 10)
     if (turn === 'b') return `<span class="num">${full}.</span>`
     if (forceBlack) return `<span class="num">${full - 1}…</span>`
     return ''
@@ -124,57 +142,85 @@ export function renderPlay(container, navigate) {
   function renderTree() {
     treeEl.innerHTML = line(tree.nodes[tree.rootId], false) || '<span class="muted">Joue un coup pour commencer.</span>'
     treeEl.querySelectorAll('.mv[data-id]').forEach((el) => { el.onclick = () => go(el.dataset.id) })
-    treeEl.querySelector('.current')?.scrollIntoView({ block: 'nearest' })
+    // scroll DANS l'arbre seulement (pas la page) — corrige le saut sur mobile
+    const cur = treeEl.querySelector('.current')
+    if (cur) treeEl.scrollTop = Math.max(0, cur.offsetTop - treeEl.clientHeight / 2)
   }
 
-  // --- panneau du coup courant (nom / commentaire / promouvoir / supprimer) ---
-  function renderPanel() {
-    const node = tree.get(currentId)
-    const isRoot = tree.isRoot(currentId)
-    panelEl.innerHTML = `
-      <h2 style="margin:0 0 8px">${isRoot ? 'Position de départ' : 'Coup : ' + esc(frSan(node.san))}</h2>
-      <label>Nom de la ligne (optionnel)</label>
-      <input id="nname" placeholder="Ex : Variante Najdorf" value="${esc(node.name)}" ${isRoot ? 'disabled' : ''}/>
-      <label>Commentaire</label>
-      <textarea id="ncomment" style="min-height:60px" ${isRoot ? 'disabled' : ''}>${esc(node.comment)}</textarea>
+  function renderNodeTools() {
+    if (tree.isRoot(currentId)) { nodeTools.innerHTML = ''; return }
+    nodeTools.innerHTML = `
       <div class="row" style="margin-top:10px">
-        <button class="btn secondary btn-sm" id="promote" ${isRoot || tree.isMainline(currentId) ? 'disabled' : ''}>⬆ Promouvoir</button>
-        <button class="btn danger btn-sm" id="delete" ${isRoot ? 'disabled' : ''}>🗑 Supprimer</button>
+        <button class="btn secondary btn-sm" id="promote" ${tree.isMainline(currentId) ? 'disabled' : ''}>⬆ Promouvoir</button>
+        <button class="btn danger btn-sm" id="del">🗑 Supprimer ce coup</button>
       </div>`
-    if (isRoot) return
-    panelEl.querySelector('#nname').oninput = (e) => tree.setName(currentId, e.target.value)
-    panelEl.querySelector('#nname').onchange = () => renderTree()
-    panelEl.querySelector('#ncomment').oninput = (e) => tree.setComment(currentId, e.target.value)
-    panelEl.querySelector('#promote').onclick = () => { tree.promote(currentId); refresh() }
-    panelEl.querySelector('#delete').onclick = () => { const p = tree.remove(currentId); currentId = p || tree.rootId; refresh() }
+    $('#promote').onclick = () => { tree.promote(currentId); refresh() }
+    $('#del').onclick = () => { const p = tree.remove(currentId); currentId = p || tree.rootId; refresh() }
   }
 
-  container.querySelector('#flip').onclick = () => board.flip()
-  container.querySelector('#reset').onclick = () => {
-    const fresh = new PgnTree(); tree.nodes = fresh.nodes; tree.rootId = fresh.rootId; tree.seq = 0
-    currentId = tree.rootId; refresh()
+  // --- bibliotheque ---
+  function renderLib() {
+    const list = loadLib()
+    const el = $('#liblist')
+    if (!list.length) { el.innerHTML = '<p class="muted">Aucune ouverture enregistrée. Joue des coups puis clique 💾 Ouverture.</p>'; return }
+    el.innerHTML = list.map((o) => `
+      <div class="opening-item">
+        <button class="opening-open" data-id="${o.id}">📖 ${esc(o.name)}</button>
+        <button class="btn danger btn-sm" data-del="${o.id}">🗑</button>
+      </div>`).join('')
+    el.querySelectorAll('.opening-open').forEach((b) => { b.onclick = () => openOpening(b.dataset.id) })
+    el.querySelectorAll('[data-del]').forEach((b) => { b.onclick = () => { saveLib(loadLib().filter((o) => o.id !== b.dataset.del)); renderLib() } })
   }
-  container.querySelector('#first').onclick = () => go(tree.rootId)
-  container.querySelector('#prev').onclick = () => { const n = tree.get(currentId); if (n.parentId) go(n.parentId) }
-  container.querySelector('#next').onclick = () => { const c = tree.childMainline(currentId); if (c) go(c) }
-  container.querySelector('#last').onclick = gotoLast
-  container.querySelector('#copyfen').onclick = () => { navigator.clipboard?.writeText(fenEl.value) }
+  function openOpening(id) {
+    const o = loadLib().find((x) => x.id === id)
+    if (!o) return
+    tree = PgnTree.fromJSON(o.tree)
+    currentId = tree.rootId
+    mode = 'replay'            // on arrive en mode lecture : navigue puis "Jouer depuis ici"
+    toggleLib(false)
+    refresh()
+  }
+  function toggleLib(open) {
+    libOpen = open ?? !libOpen
+    $('#libcard').hidden = !libOpen
+    if (libOpen) renderLib()
+  }
 
-  const saveBtn = container.querySelector('#save')
-  if (saveBtn) {
-    saveBtn.onclick = async () => {
-      const msg = container.querySelector('#savemsg')
-      if (!tree.nodes[tree.rootId].children.length) { msg.textContent = " Joue d'abord quelques coups."; return }
-      const name = prompt("Nom de l'étude :", 'Ma partie')
-      if (name === null) return
-      msg.textContent = ' Enregistrement…'
-      try {
-        const study = await createStudy({ name: name || 'Ma partie', color: 'white' })
-        await saveStudy(study.id, { name: name || 'Ma partie', color: 'white', tree: tree.toJSON() })
-        navigate('#/etude/' + study.id)
-      } catch (e) { msg.textContent = ' Erreur : ' + e.message }
-    }
+  // --- actions ---
+  $('#flip').onclick = () => board.flip()
+  $('#lib').onclick = () => toggleLib()
+  $('#libclose').onclick = () => toggleLib(false)
+
+  $('#reset').onclick = () => {
+    tree = new PgnTree(); currentId = tree.rootId; mode = 'edit'; refresh()
   }
+  $('#rejouer').onclick = () => {
+    mode = mode === 'replay' ? 'edit' : 'replay'
+    if (mode === 'replay') currentId = tree.rootId   // on rejoue depuis le debut
+    refresh()
+  }
+  $('#variante').onclick = () => {
+    if (tree.isRoot(currentId)) { return }
+    const name = prompt('Nom de cette variante :', tree.get(currentId).name || 'Ma variante')
+    if (name === null) return
+    tree.setName(currentId, name); refresh()
+  }
+  $('#ouverture').onclick = () => {
+    if (!hasMoves()) return
+    const name = prompt("Nom de l'ouverture :", 'Mon ouverture')
+    if (name === null) return
+    const list = loadLib()
+    list.unshift({ id: 'o' + Date.now(), name: name || 'Mon ouverture', tree: tree.toJSON() })
+    saveLib(list)
+    statusEl.textContent = '✓ Ouverture enregistrée dans 📂 Mes ouvertures'
+  }
+
+  $('#first').onclick = () => go(tree.rootId)
+  $('#prev').onclick = () => { const n = tree.get(currentId); if (n.parentId) go(n.parentId) }
+  $('#next').onclick = () => { const c = tree.childMainline(currentId); if (c) go(c) }
+  $('#last').onclick = () => { let id = currentId; while (tree.childMainline(id)) id = tree.childMainline(id); go(id) }
+  $('#playhere').onclick = () => { mode = 'edit'; refresh() }
+  $('#copyfen').onclick = () => navigator.clipboard?.writeText(fenEl.value)
 
   refresh()
   return () => board.destroy()

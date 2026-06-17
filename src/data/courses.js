@@ -34,11 +34,32 @@ export const COURSES = [
         ]
       },
       {
+        title: 'Le plan moderne (manœuvre Cbd2-f1-g3)', place: '...6.O-O O-O 7.Te1 a6 8.a4',
+        intro: "Le plan typique de l'Italienne moderne : on ne se précipite pas sur d4. On réarrange ses pièces (Cbd2-f1-g3, Fc4-b3, h3) pour préparer une attaque lente au centre et à l'aile roi.",
+        line: [
+          { san: 'e4' }, { san: 'e5' }, { san: 'Nf3' }, { san: 'Nc6' }, { san: 'Bc4' }, { san: 'Bc5' },
+          { san: 'c3' }, { san: 'Nf6' }, { san: 'd3' }, { san: 'd6' }, { san: 'O-O' },
+          { san: 'O-O', note: 'Les deux rois sont à l\'abri.' },
+          { san: 'Re1', note: 'On surprotège e4 avant toute action.' },
+          { san: 'a6', note: 'Les Noirs préviennent Fb5 et préparent ...Fa7.' },
+          { san: 'a4', note: 'On gagne de l\'espace à l\'aile dame ; le jeu de manœuvre commence.' }
+        ]
+      },
+      {
+        title: 'La défense hongroise', place: '3...Fe7 4.d4 exd4 5.Cxd4',
+        intro: "3...Fe7 est modeste mais très solide : les Noirs évitent toute complication tactique. Les Blancs prennent l'espace au centre avec d4 et gardent un petit avantage de développement.",
+        line: [
+          { san: 'e4' }, { san: 'e5' }, { san: 'Nf3' }, { san: 'Nc6' }, { san: 'Bc4' },
+          { san: 'Be7', note: 'La défense hongroise : prudente et sans risque.' },
+          { san: 'd4', note: 'On occupe le centre tant qu\'on le peut.' },
+          { san: 'exd4' }, { san: 'Nxd4', note: 'Centre dégagé, léger confort pour les Blancs.' }
+        ]
+      },
+      {
         title: 'Le Gambit Evans', place: '3...Fc5 4.b4!?',
         intro: "Un gambit romantique : 4.b4 offre un pion pour gagner du temps (4...Fxb4 5.c3) et bâtir un gros centre avec d4. L'arme favorite de Morphy et... Kasparov.",
         line: [
-          { san: 'e4' }, { san: 'e5' }, { san: 'Nf3' }, { san: 'Nc6' }, { san: 'Bc4' },
-          { san: 'Bc5' },
+          { san: 'e4' }, { san: 'e5' }, { san: 'Nf3' }, { san: 'Nc6' }, { san: 'Bc4' }, { san: 'Bc5' },
           { san: 'b4', note: 'Le Gambit Evans : on offre le pion b.' },
           { san: 'Bxb4', note: 'Accepter est le plus critique.' },
           { san: 'c3', note: 'On chasse le fou en gagnant un tempo.' },
@@ -105,7 +126,7 @@ export const COURSES = [
           { san: 'Ng5' },
           { san: 'Bc5', note: 'Le Contre-gambit Traxler : du tac au tac, on vise f2.' },
           { san: 'Bxf7+', note: "La réfutation de principe : on prend f7 sans s'aventurer." },
-          { san: 'Ke7', note: 'Le roi noir reste au centre ; partie très déséquilibrée mais saine pour les Blancs.' }
+          { san: 'Ke7', note: 'Le roi noir reste au centre ; partie déséquilibrée mais saine pour les Blancs.' }
         ]
       }
     ]
@@ -137,12 +158,14 @@ export const COURSES = [
         ]
       },
       {
-        title: "La variante d'échange", place: '3...a6 4.Fxc6 dxc6',
-        intro: '4.Fxc6 simplifie : les Blancs cèdent la paire de fous mais abîment la structure noire. Idéal si tu aimes les finales (plan : d4, échanger, jouer la majorité saine).',
+        title: 'La variante fermée', place: '...6.Te1 b5 7.Fb3 d6 8.c3 O-O 9.h3',
+        intro: "Le cœur de l'Espagnole : les Noirs jouent ...b5, ...d6, ...O-O et préparent ...Ca5 ou ...Cd7. 9.h3 empêche ...Fg4. S'ensuit une longue bataille de manœuvre typique des grands matchs.",
         line: [
           { san: 'e4' }, { san: 'e5' }, { san: 'Nf3' }, { san: 'Nc6' }, { san: 'Bb5' }, { san: 'a6' },
-          { san: 'Bxc6', note: 'On échange volontairement le fou...' },
-          { san: 'dxc6', note: '...pour donner aux Noirs des pions doublés c6-c7.' }
+          { san: 'Ba4' }, { san: 'Nf6' }, { san: 'O-O' }, { san: 'Be7' }, { san: 'Re1' },
+          { san: 'b5', note: 'On chasse définitivement le fou.' },
+          { san: 'Bb3' }, { san: 'd6', note: 'On soutient e5.' }, { san: 'c3' },
+          { san: 'O-O' }, { san: 'h3', note: 'Coup prophylactique clé : on empêche ...Fg4.' }
         ]
       },
       {
@@ -215,9 +238,21 @@ export const COURSES = [
           { san: 'g6', note: 'On prépare le fianchetto : la Dragon.' },
           { san: 'Be3' },
           { san: 'Bg7', note: 'Le dragon est en place sur la grande diagonale.' },
-          { san: 'f3', note: 'Les Blancs préparent Dd2, O-O-O et la tempête de pions h4-h5.' },
+          { san: 'f3', note: 'Les Blancs préparent Dd2, O-O-O et la tempête h4-h5.' },
           { san: 'O-O' },
           { san: 'Nc6', note: 'Les deux camps vont attaquer le roi adverse à toute vitesse.' }
+        ]
+      },
+      {
+        title: 'La Sveshnikov', place: '...4.Cxd4 Cf6 5.Cc3 e5 6.Cdb5 d6 7.Fg5',
+        intro: "Une approche moderne et très théorique : ...e5 chasse le cavalier et accepte un trou en d5 contre un jeu de pièces très actif. Adoubée par Kramnik, Carlsen, Radjabov.",
+        line: [
+          { san: 'e4' }, { san: 'c5' }, { san: 'Nf3' }, { san: 'Nc6' }, { san: 'd4' },
+          { san: 'cxd4' }, { san: 'Nxd4' }, { san: 'Nf6' }, { san: 'Nc3' },
+          { san: 'e5', note: 'La Sveshnikov : on chasse le cavalier d4.' },
+          { san: 'Ndb5', note: 'Le cavalier saute vers d6/a3.' },
+          { san: 'd6', note: 'On contrôle d6 et on assume le trou en d5.' },
+          { san: 'Bg5', note: 'On presse f6/d5 ; jeu très concret pour les deux camps.' }
         ]
       },
       {
@@ -283,6 +318,18 @@ export const COURSES = [
         ]
       },
       {
+        title: 'La Classique Steinitz', place: '3.Cc3 Cf6 4.e5 Cfd7 5.f4 c5',
+        intro: "3.Cc3 Cf6 invite 4.e5 : le cavalier f6 est repoussé en d7 et les Blancs gagnent de l'espace. Les Noirs contre-attaquent classiquement la base d4 avec ...c5 et ...Cc6.",
+        line: [
+          { san: 'e4' }, { san: 'e6' }, { san: 'd4' }, { san: 'd5' },
+          { san: 'Nc3' }, { san: 'Nf6' },
+          { san: 'e5', note: 'On repousse le cavalier et on prend l\'espace.' },
+          { san: 'Nfd7', note: 'Le cavalier se replie pour soutenir ...c5.' },
+          { san: 'f4', note: 'Les Blancs renforcent leur centre e5.' },
+          { san: 'c5', note: 'On attaque immédiatement la base d4.' }
+        ]
+      },
+      {
         title: 'La Winawer 3.Cc3 Fb4', place: '3.Cc3 Fb4 4.e5 c5 5.a3 Fxc3+ 6.bxc3',
         intro: "La variante la plus mordante : ...Fb4 cloue le cavalier c3. Après l'échange, les Blancs ont la paire de fous et un centre, les Noirs visent les pions doublés c3-c2. Déséquilibre total.",
         line: [
@@ -324,6 +371,15 @@ export const COURSES = [
           { san: 'Bf5', note: 'Le bon fou sort librement : impossible en Française !' },
           { san: 'Ng3' },
           { san: 'Bg6', note: 'Le fou recule sur une case sûre ; suivra ...e6, ...Cd7, ...Cgf6.' }
+        ]
+      },
+      {
+        title: 'La variante Karpov 4...Cd7', place: '3.Cc3 dxe4 4.Cxe4 Cd7',
+        intro: "Le choix d'élite de Karpov : 4...Cd7 prépare ...Cgf6 sans permettre aux Blancs d'abîmer la structure par Cxf6+. Solidité maximale, mais demande de la précision.",
+        line: [
+          { san: 'e4' }, { san: 'c6' }, { san: 'd4' }, { san: 'd5' },
+          { san: 'Nc3' }, { san: 'dxe4' }, { san: 'Nxe4' },
+          { san: 'Nd7', note: 'On prépare ...Cgf6 en évitant les pions doublés.' }
         ]
       },
       {
@@ -375,7 +431,7 @@ export const COURSES = [
           { san: 'd4' },
           { san: 'Nf6', note: 'Développement et contrôle de e4.' },
           { san: 'Nf3' },
-          { san: 'c6', note: 'Cleé : on ménage la case c7/b6 pour la dame et on solidifie d5.' }
+          { san: 'c6', note: 'Clé : on ménage la case c7/b6 pour la dame et on solidifie.' }
         ]
       },
       {
@@ -386,6 +442,57 @@ export const COURSES = [
           { san: 'Nf6', note: 'On retarde la reprise pour éviter de sortir la dame.' },
           { san: 'd4' },
           { san: 'Nxd5', note: 'Le cavalier reprend et se centralise ; suivra ...g6 ou ...Ff5.' }
+        ]
+      },
+      {
+        title: 'Le Gambit portugais', place: '2...Cf6 3.d4 Fg4!?',
+        intro: "Très ambitieux : au lieu de reprendre d5 tout de suite, les Noirs sortent le fou en g4 et offrent même un pion pour une grosse avance de développement. Piégeux et amusant.",
+        line: [
+          { san: 'e4' }, { san: 'd5' }, { san: 'exd5' },
+          { san: 'Nf6' }, { san: 'd4' },
+          { san: 'Bg4', note: 'Le Gambit portugais : développement avant tout, on récupérera d5 plus tard.' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'estindienne', name: "L'Est-Indienne", eco: 'E60', icon: '🐯',
+    cover: '#c98a3c', dark: '#a06a28', side: 'black',
+    tagline: 'Laisse le centre aux Blancs… pour mieux le détruire',
+    steps: [
+      {
+        title: 'La configuration hypermoderne', place: '1.d4 Cf6 2.c4 g6 3.Cc3 Fg7 4.e4 d6',
+        intro: "Idée hypermoderne : les Noirs laissent les Blancs bâtir un gros centre, puis l'attaqueront avec ...e5 ou ...c5 et le fou g7. Une des défenses les plus combatives contre 1.d4.",
+        line: [
+          { san: 'd4' }, { san: 'Nf6' }, { san: 'c4' },
+          { san: 'g6', note: 'On prépare le fianchetto.' },
+          { san: 'Nc3' },
+          { san: 'Bg7', note: 'Le fou vise le grand centre blanc.' },
+          { san: 'e4', note: 'Les Blancs acceptent de prendre tout le centre.' },
+          { san: 'd6', note: 'On prépare le coup de levier ...e5.' }
+        ]
+      },
+      {
+        title: 'La variante classique', place: '5.Cf3 O-O 6.Fe2 e5',
+        intro: "Le plan vedette : ...e5 ! frappe le centre. Si 7.O-O, les Noirs verrouillent par ...Cc6, ...Ce7 et lancent la tempête ...f5-f4-g5 contre le roi blanc.",
+        line: [
+          { san: 'd4' }, { san: 'Nf6' }, { san: 'c4' }, { san: 'g6' }, { san: 'Nc3' }, { san: 'Bg7' },
+          { san: 'e4' }, { san: 'd6' }, { san: 'Nf3' },
+          { san: 'O-O', note: 'Roi en sécurité.' },
+          { san: 'Be2' },
+          { san: 'e5', note: 'Le coup clé : on défie le centre blanc.' }
+        ]
+      },
+      {
+        title: "L'attaque à l'aile roi", place: '7.O-O Cc6 8.d5 Ce7',
+        intro: "Après 8.d5, le centre se ferme et chacun attaque de son côté : les Blancs à l'aile dame (c5), les Noirs à l'aile roi avec ...Cd7, ...f5, ...f4, ...g5. Course de vitesse classique.",
+        line: [
+          { san: 'd4' }, { san: 'Nf6' }, { san: 'c4' }, { san: 'g6' }, { san: 'Nc3' }, { san: 'Bg7' },
+          { san: 'e4' }, { san: 'd6' }, { san: 'Nf3' }, { san: 'O-O' }, { san: 'Be2' }, { san: 'e5' },
+          { san: 'O-O' },
+          { san: 'Nc6', note: 'On presse d4.' },
+          { san: 'd5', note: 'Le centre se ferme : signal de la course aux deux ailes.' },
+          { san: 'Ne7', note: 'Le cavalier file vers g6/f5 pour l\'attaque ...f5.' }
         ]
       }
     ]
@@ -433,6 +540,53 @@ export const COURSES = [
           { san: 'Nf3' }, { san: 'Nf6' }, { san: 'Nc3' },
           { san: 'dxc4', note: 'Maintenant on prend, en préparant ...Ff5 et ...b5.' }
         ]
+      },
+      {
+        title: 'La défense Tarrasch', place: '2...e6 3.Cc3 c5 4.cxd5 exd5 5.Cf3 Cc6',
+        intro: "Les Noirs acceptent un pion dame isolé en échange d'un jeu de pièces très actif et libre. Une défense énergique recommandée par Tarrasch puis Kasparov.",
+        line: [
+          { san: 'd4' }, { san: 'd5' }, { san: 'c4' }, { san: 'e6' }, { san: 'Nc3' },
+          { san: 'c5', note: 'La Tarrasch : on frappe le centre, quitte à avoir un pion isolé.' },
+          { san: 'cxd5' }, { san: 'exd5' }, { san: 'Nf3' },
+          { san: 'Nc6', note: 'Pièces actives : le pion isolé d5 est dynamique, pas faible.' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'anglaise', name: "L'Anglaise", eco: 'A10', icon: '🎩',
+    cover: '#7c9c7c', dark: '#5c7c5c', side: 'white',
+    tagline: 'Le flanc tranquille mais venimeux : 1.c4',
+    steps: [
+      {
+        title: 'Le coup de flanc 1.c4', place: '1.c4 e5 2.Cc3 Cf6',
+        intro: "1.c4 contrôle d5 depuis le flanc. Après 1...e5, on obtient une « Sicilienne inversée » avec un tempo de plus : flexible, riche en plans, difficile à attaquer.",
+        line: [
+          { san: 'c4', note: 'On contrôle d5 sans engager le centre.' },
+          { san: 'e5', note: 'Les Noirs prennent leur part du centre.' },
+          { san: 'Nc3' },
+          { san: 'Nf6', note: 'Position de Sicilienne avec les couleurs inversées.' }
+        ]
+      },
+      {
+        title: 'Le grand fianchetto', place: '2...Cf6 3.g3 d5 4.cxd5 Cxd5 5.Fg2',
+        intro: "Le plan signature de l'Anglaise : Fg2 sur la grande diagonale. On vise le centre et l'aile dame de loin, à la manière hypermoderne. Setup ultra-solide et polyvalent.",
+        line: [
+          { san: 'c4' }, { san: 'e5' }, { san: 'Nc3' }, { san: 'Nf6' },
+          { san: 'g3', note: 'On prépare le fianchetto du roi.' },
+          { san: 'd5' }, { san: 'cxd5' }, { san: 'Nxd5' },
+          { san: 'Bg2', note: 'Le fou rayonne sur la grande diagonale a8-h1.' }
+        ]
+      },
+      {
+        title: "L'Anglaise symétrique", place: '1.c4 c5 2.Cf3 Cc6 3.Cc3',
+        intro: "Si les Noirs imitent (1...c5), on obtient une structure symétrique très équilibrée mais pleine de nuances. Les Blancs jouent souvent g3, Fg2, et cherchent la poussée d4 au bon moment.",
+        line: [
+          { san: 'c4' },
+          { san: 'c5', note: 'Les Noirs jouent symétriquement.' },
+          { san: 'Nf3' }, { san: 'Nc6' },
+          { san: 'Nc3', note: 'On développe ; suivra g3, Fg2, O-O, et d4 au moment opportun.' }
+        ]
       }
     ]
   },
@@ -461,6 +615,16 @@ export const COURSES = [
           { san: 'Nbd2', note: 'Le cavalier vise e5 et f3.' },
           { san: 'Bd6' },
           { san: 'Bg3', note: 'On échange ou on garde le bon fou ; setup idéal atteint.' }
+        ]
+      },
+      {
+        title: 'Gérer le coup ...Db6', place: '...4.Cf3 c5 5.Cc3 Db6',
+        intro: "Le piège typique : ...Db6 attaque le pion b2. Au lieu de le défendre passivement, 5.Cc3 ! laisse b2 et mise sur le développement (après Dxb2, Cb5 piège la dame). À retenir.",
+        line: [
+          { san: 'd4' }, { san: 'd5' }, { san: 'Bf4' }, { san: 'Nf6' }, { san: 'e3' },
+          { san: 'e6' }, { san: 'Nf3' }, { san: 'c5' },
+          { san: 'Nc3', note: 'On développe et on ignore (presque) b2.' },
+          { san: 'Qb6', note: 'La dame lorgne b2 — mais Cb5 ! la mettrait en danger après Dxb2.' }
         ]
       },
       {

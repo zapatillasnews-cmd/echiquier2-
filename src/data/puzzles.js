@@ -69,6 +69,18 @@ export const PUZZLES = [
     fen: '5k2/8/5K2/8/8/8/8/1R6 w - - 0 1',
     solution: ['b1b8'],
     explanation: "Tb8# : la tour mate sur la 8e rangée pendant que le roi blanc en f6 verrouille toutes les cases de fuite (e7, f7, g7). Le mat élémentaire tour + roi : la tour donne l'échec, le roi enlève l'air."
+  },
+  {
+    id: 'p12', theme: 'Mat de Légal', rating: 1500, mate: true,
+    fen: 'r2qkbnr/ppp2ppp/2np4/4N3/2B1P3/2N5/PPPP1PPP/R2bK2R w KQkq - 0 6',
+    solution: ['c4f7', 'e8e7', 'c3d5'],
+    explanation: "Le légendaire Mat de Légal ! Les Noirs ont été trop gourmands (...Fxd1). 1.Fxf7+ ! Le roi DOIT aller en e7 : il ne peut pas prendre en f7 (case défendue par le cavalier e5) ni fuir. Puis 2.Cd5# : mat à trois pièces mineures, dame en moins. Une combinaison à connaître par cœur."
+  },
+  {
+    id: 'p13', theme: "Mat de l'Arabe", rating: 1000, mate: true,
+    fen: '7k/8/5N2/8/8/8/7R/6K1 w - - 0 1',
+    solution: ['h2h7'],
+    explanation: "Th7# : le mat de l'Arabe, l'un des plus vieux schémas connus. La tour en h7 contrôle la colonne h ET la 7e rangée (g7), pendant que le cavalier f6 verrouille g8. Tour + cavalier dans le coin = duo mortel."
   }
 ]
 
@@ -95,5 +107,13 @@ export const FIND_BEST_POSITIONS = [
   'r1bqkbnr/pp3ppp/2n1p3/2ppP3/3P4/2P2N2/PP3PPP/RNBQKB1R w KQkq - 0 1',
   // Finales precises
   '8/5pk1/6p1/8/8/6P1/5PK1/3r4 w - - 0 1',
-  '8/8/4k3/8/8/3K1Q2/8/5r2 w - - 0 1'
+  '8/8/4k3/8/8/3K1Q2/8/5r2 w - - 0 1',
+  // Sicilienne / milieux de jeu pointus
+  'rnbqkb1r/1p3ppp/p2ppn2/8/3NP3/2N1B3/PPP2PPP/R2QKB1R w KQkq - 0 1',
+  'rnbq1rk1/ppp1ppbp/3p1np1/8/2PPP3/2N2N2/PP2BPPP/R1BQK2R w KQ - 0 1',
+  'r3k2r/pppq1ppp/2n1bn2/2b1p3/2B1P3/2NP1N2/PPPBQPPP/R3K2R w KQkq - 0 1',
+  'r1bq1rk1/pp2bppp/2n2n2/2pp4/3P4/2N1PN2/PP2BPPP/R1BQ1RK1 w - - 0 1',
+  // Finales theoriques
+  '8/8/8/3k4/8/3K1Q2/8/4r3 w - - 0 1',
+  '8/8/8/4k3/8/8/4K3/R6r w - - 0 1'
 ]

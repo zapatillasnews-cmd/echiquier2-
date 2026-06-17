@@ -133,6 +133,7 @@ export class InteractiveBoard {
   }
 
   setOrientation(o) { this.cg.set({ orientation: o }) }
+  setViewOnly(v) { this.cg.set({ viewOnly: !!v }) }
   flip() { this.cg.toggleOrientation() }
   destroy() { this.cg.destroy() }
 }
