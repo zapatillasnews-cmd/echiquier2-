@@ -1,6 +1,7 @@
 import './styles/main.css'
 import { getUser, signOut, onAuthChange, isSupabaseConfigured } from './supabase.js'
 import { applyBoardTheme, currentBoardTheme, applyAppMode, currentAppMode, toggleAppMode } from './ui/themes.js'
+import { renderHome } from './views/home.js'
 import { renderPlay } from './views/play.js'
 import { renderGames, renderImport, renderGameView } from './views/games.js'
 import { renderStudies, renderStudyEditor } from './views/studies.js'
@@ -13,87 +14,93 @@ import { renderAuth } from './views/auth.js'
 
 const app = document.getElementById('app')
 let currentUser = null
-let cleanup = null   // fonction de nettoyage de la vue courante (board, listeners)
+let cleanup = null   // nettoyage de la vue courante (board, listeners)
 
 function navigate(hash) {
   if (location.hash === hash) router()
   else location.hash = hash
 }
 
-const NAV = [
-  { hash: '#/parties', label: 'Parties', auth: true },
-  { hash: '#/etudes', label: 'Etudes', auth: true },
-  { hash: '#/revision', label: 'Revision', auth: true },
-  { hash: '#/puzzles', label: 'Problemes', auth: false },
-  { hash: '#/jouer', label: 'Jouer', auth: false },
-  { hash: '#/minijeux', label: 'Mini-jeux', auth: false },
-  { hash: '#/reglages', label: 'Reglages', auth: false }
+// Onglets principaux (barre du bas). Les autres modules sont accessibles via l'accueil.
+const TABS = [
+  { hash: '#/accueil',  label: 'Accueil',   icon: '🏠', auth: false },
+  { hash: '#/parties',  label: 'Parties',   icon: '📚', auth: true  },
+  { hash: '#/jouer',    label: 'Jouer',     icon: '♟️', auth: false },
+  { hash: '#/minijeux', label: 'Entraîner', icon: '🎯', auth: false },
+  { hash: '#/reglages', label: 'Réglages',  icon: '⚙️', auth: false }
 ]
 
-function renderShell(activeHash) {
-  app.innerHTML = `
-    <header class="topbar">
-      <div class="brand">Echi<span>quier</span></div>
-      <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
-      <div class="menu" id="menu">
-        <nav id="nav"></nav>
-        <div class="user" id="userbox"></div>
-      </div>
-    </header>
-    <main id="view"></main>`
-
-  const nav = app.querySelector('#nav')
-  NAV.forEach((item) => {
-    if (item.auth && !isSupabaseConfigured) return
-    const a = document.createElement('a')
-    a.href = item.hash
-    a.textContent = item.label
-    // surbrillance : route exacte ou sous-route (ex. #/etude/ pour Etudes)
-    const base = item.hash.replace(/s$/, '')
-    if (activeHash.startsWith(item.hash) || activeHash.startsWith(base + '/')) a.classList.add('active')
-    nav.appendChild(a)
-  })
-
-  const userbox = app.querySelector('#userbox')
-  const modeIcon = currentAppMode() === 'light' ? '🌙' : '☀️'
-  const modeBtn = `<a href="#" id="modeToggle" title="Jour / nuit">${modeIcon}</a>`
-  if (!isSupabaseConfigured) {
-    userbox.innerHTML = modeBtn + ' <span class="muted">mode local</span>'
-  } else if (currentUser) {
-    userbox.innerHTML = `${modeBtn} <span class="email">${currentUser.email}</span> <a href="#" id="logout">Deconnexion</a>`
-    userbox.querySelector('#logout').onclick = async (e) => { e.preventDefault(); await signOut(); navigate('#/jouer') }
-  } else {
-    userbox.innerHTML = modeBtn + ' <a href="#/login">Connexion</a>'
-  }
-  userbox.querySelector('#modeToggle').onclick = (e) => { e.preventDefault(); toggleAppMode(); renderShellRefresh(activeHash) }
-
-  // menu mobile
-  const menu = app.querySelector('#menu')
-  app.querySelector('#menuToggle').onclick = () => menu.classList.toggle('open')
-  menu.querySelectorAll('a').forEach((a) => { if (a.id !== 'modeToggle') a.addEventListener('click', () => menu.classList.remove('open')) })
-
-  return app.querySelector('#view')
+// Quels onglets s'allument pour quelle route.
+const TAB_GROUPS = {
+  '#/accueil':  ['#/accueil'],
+  '#/parties':  ['#/parties', '#/import', '#/partie/', '#/etudes', '#/etude/'],
+  '#/jouer':    ['#/jouer'],
+  '#/minijeux': ['#/minijeux', '#/puzzles', '#/revision'],
+  '#/reglages': ['#/reglages']
 }
 
-// Re-applique juste l'icone jour/nuit sans recharger la vue.
-function renderShellRefresh(activeHash) {
-  const icon = currentAppMode() === 'light' ? '🌙' : '☀️'
-  const t = app.querySelector('#modeToggle'); if (t) t.textContent = icon
+function renderShell(activeHash) {
+  const modeIcon = currentAppMode() === 'light' ? '🌙' : '☀️'
+  app.innerHTML = `
+    <header class="topbar">
+      <a class="brand" href="#/accueil" id="brand">
+        <span class="brand-mark">♟️</span>
+        <span class="script brand-name">Échi<span>quier</span></span>
+      </a>
+      <div class="head-actions">
+        <button class="icon-btn" id="modeToggle" title="Jour / nuit">${modeIcon}</button>
+        <div class="userbox" id="userbox"></div>
+      </div>
+    </header>
+    <main id="view"></main>
+    <nav id="tabbar"></nav>`
+
+  // Onglets du bas
+  const tabbar = app.querySelector('#tabbar')
+  TABS.forEach((t) => {
+    if (t.auth && !isSupabaseConfigured) return
+    const a = document.createElement('a')
+    a.href = t.hash
+    a.className = 'tab'
+    a.innerHTML = `<span class="tab-icon">${t.icon}</span><span>${t.label}</span>`
+    const group = TAB_GROUPS[t.hash] || [t.hash]
+    if (group.some((g) => activeHash.startsWith(g))) a.classList.add('active')
+    tabbar.appendChild(a)
+  })
+
+  // Boite utilisateur
+  const userbox = app.querySelector('#userbox')
+  if (!isSupabaseConfigured) {
+    userbox.innerHTML = '<span class="muted">mode local</span>'
+  } else if (currentUser) {
+    userbox.innerHTML = `<span class="email">${currentUser.email}</span> <a href="#" id="logout">Déconnexion</a>`
+    userbox.querySelector('#logout').onclick = async (e) => { e.preventDefault(); await signOut(); navigate('#/accueil') }
+  } else {
+    userbox.innerHTML = '<a href="#/login">Connexion</a>'
+  }
+
+  app.querySelector('#modeToggle').onclick = (e) => {
+    e.preventDefault(); toggleAppMode()
+    const t = app.querySelector('#modeToggle'); if (t) t.textContent = currentAppMode() === 'light' ? '🌙' : '☀️'
+  }
+
+  return app.querySelector('#view')
 }
 
 async function router() {
   if (cleanup) { try { cleanup() } catch {} cleanup = null }
 
-  const hash = location.hash || (isSupabaseConfigured && currentUser ? '#/parties' : '#/jouer')
+  const hash = location.hash || '#/accueil'
   const view = renderShell(hash)
 
   const protectedRoute = hash.startsWith('#/parties') || hash.startsWith('#/import') ||
     hash.startsWith('#/partie') || hash.startsWith('#/etude') || hash.startsWith('#/revision')
   if (isSupabaseConfigured && protectedRoute && !currentUser) {
-    return renderAuth(view, { onSignedIn: () => navigate('#/parties') })
+    return renderAuth(view, { onSignedIn: () => navigate('#/accueil') })
   }
 
-  if (hash.startsWith('#/login')) return renderAuth(view, { onSignedIn: () => navigate('#/parties') })
+  if (hash.startsWith('#/login')) return renderAuth(view, { onSignedIn: () => navigate('#/accueil') })
+  if (hash.startsWith('#/accueil')) return renderHome(view, navigate)
   if (hash.startsWith('#/jouer')) { cleanup = renderPlay(view, navigate); return }
   if (hash.startsWith('#/import')) return renderImport(view, navigate)
   if (hash.startsWith('#/partie/')) { cleanup = await renderGameView(view, hash.split('/')[2], navigate); return }
@@ -105,10 +112,10 @@ async function router() {
   if (hash.startsWith('#/minijeux/cavalier')) { cleanup = renderKnightVision(view, navigate); return }
   if (hash.startsWith('#/minijeux/meilleurcoup')) { cleanup = renderFindBest(view, navigate); return }
   if (hash.startsWith('#/minijeux')) return renderMinigamesHub(view, navigate)
+  if (hash.startsWith('#/parties')) return renderGames(view, navigate)
   if (hash.startsWith('#/reglages')) { cleanup = await renderSettings(view); return }
   // defaut
-  if (isSupabaseConfigured) return renderGames(view, navigate)
-  cleanup = renderPlay(view, navigate)
+  return renderHome(view, navigate)
 }
 
 async function start() {

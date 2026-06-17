@@ -1,4 +1,5 @@
 // Mini-jeux d'echecs (sans moteur) : entrainement aux coordonnees et vision du cavalier.
+import { isSupabaseConfigured } from '../supabase.js'
 
 const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 const RANKS = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -33,24 +34,25 @@ function setBest(game, v) {
 
 // ---------------- Hub ----------------
 export function renderMinigamesHub(container, navigate) {
+  const cards = [
+    { go: '#/puzzles',              icon: '🧩', name: 'Problèmes',      desc: 'Tactiques à résoudre, avec explications.', cover: '#d96f4c', dark: '#b5542f' },
+    { go: '#/minijeux/meilleurcoup',icon: '🤖', name: 'Meilleur coup',  desc: 'Trouve le coup que jouerait Stockfish.',  cover: '#6e7f8d', dark: '#54636f' },
+    { go: '#/minijeux/coordonnees', icon: '🎯', name: 'Coordonnées',    desc: `Vise la bonne case en 30 s. Record : ${getBest('coord')}`, cover: '#e0a83c', dark: '#b9852a' },
+    { go: '#/minijeux/cavalier',    icon: '♞', name: 'Vision cavalier',desc: `Toutes les cases du cavalier. Record : ${getBest('knight')}`, cover: '#8aab8a', dark: '#6a8c6a' },
+    { go: '#/revision',             icon: '🔁', name: 'Révision',       desc: 'Revois tes ouvertures (répétition espacée).', cover: '#7d9bb8', dark: '#5d7c98', auth: true }
+  ]
+  const html = cards
+    .filter((c) => !c.auth || isSupabaseConfigured)
+    .map((c) => `
+      <button class="module-card" data-go="${c.go}" style="--cover:${c.cover};--cover-dark:${c.dark}">
+        <span class="module-icon">${c.icon}</span>
+        <span class="module-name">${c.name}</span>
+        <span class="module-desc">${c.desc}</span>
+      </button>`).join('')
   container.innerHTML = `
-    <h1>Mini-jeux</h1>
-    <div class="game-grid">
-      <div class="card game-item" data-go="#/minijeux/coordonnees">
-        <div class="players">🎯 Coordonnees</div>
-        <div class="meta">Trouve la case nommee le plus vite possible (30 s).</div>
-        <div class="meta">Record : ${getBest('coord')}</div>
-      </div>
-      <div class="card game-item" data-go="#/minijeux/cavalier">
-        <div class="players">♞ Vision du cavalier</div>
-        <div class="meta">Clique toutes les cases attaquees par le cavalier.</div>
-        <div class="meta">Record : ${getBest('knight')}</div>
-      </div>
-      <div class="card game-item" data-go="#/minijeux/meilleurcoup">
-        <div class="players">🧠 Trouve le meilleur coup</div>
-        <div class="meta">Une position, a toi de trouver le coup que jouerait Stockfish.</div>
-      </div>
-    </div>`
+    <h1>S'entraîner ♟️</h1>
+    <p class="muted" style="margin-bottom:16px">Tactiques, moteur et mini-jeux pour aiguiser ta vision.</p>
+    <div class="module-grid">${html}</div>`
   container.querySelectorAll('[data-go]').forEach((el) => { el.onclick = () => navigate(el.dataset.go) })
 }
 

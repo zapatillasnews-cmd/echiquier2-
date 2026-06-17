@@ -32,7 +32,7 @@ export function currentBoardTheme() {
 }
 
 // --- Mode jour / nuit (chrome de l'app) ---
-export function currentAppMode() { return localStorage.getItem('appMode') || 'dark' }
+export function currentAppMode() { return localStorage.getItem('appMode') || 'light' }
 export function applyAppMode(mode) {
   document.documentElement.setAttribute('data-theme', mode === 'light' ? 'light' : 'dark')
   localStorage.setItem('appMode', mode === 'light' ? 'light' : 'dark')
