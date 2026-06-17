@@ -46,8 +46,11 @@ export function renderMinigamesHub(container, navigate) {
         <div class="meta">Clique toutes les cases attaquees par le cavalier.</div>
         <div class="meta">Record : ${getBest('knight')}</div>
       </div>
-    </div>
-    <p class="muted" style="margin-top:16px">D'autres jeux arrivent (tactiques, memoire, « trouve le meilleur coup » avec Stockfish).</p>`
+      <div class="card game-item" data-go="#/minijeux/meilleurcoup">
+        <div class="players">🧠 Trouve le meilleur coup</div>
+        <div class="meta">Une position, a toi de trouver le coup que jouerait Stockfish.</div>
+      </div>
+    </div>`
   container.querySelectorAll('[data-go]').forEach((el) => { el.onclick = () => navigate(el.dataset.go) })
 }
 

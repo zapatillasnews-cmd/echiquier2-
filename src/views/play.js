@@ -1,7 +1,10 @@
+import { Chess } from 'chess.js'
 import { Board } from '../ui/board.js'
+import { PgnTree } from '../chess/PgnTree.js'
+import { isSupabaseConfigured, createStudy, saveStudy } from '../supabase.js'
 
 // Jeu libre : on joue les deux camps, coups legaux, historique cliquable.
-export function renderPlay(container) {
+export function renderPlay(container, navigate) {
   container.innerHTML = `
     <h1>Echiquier</h1>
     <div class="board-layout">
@@ -18,6 +21,13 @@ export function renderPlay(container) {
           <div class="movelist" id="moves"></div>
           <p class="muted" id="status" style="margin-top:12px"></p>
         </div>
+        ${isSupabaseConfigured ? `
+        <div class="card">
+          <h2>Sauvegarder</h2>
+          <p class="muted">Transforme cette suite de coups en etude (variantes editables).</p>
+          <button class="btn" id="tostudy">Enregistrer dans Etudes</button>
+          <span id="savemsg" class="muted"></span>
+        </div>` : ''}
         <div class="card">
           <h2>FEN</h2>
           <input id="fen" readonly />
@@ -61,6 +71,24 @@ export function renderPlay(container) {
   container.querySelector('#reset').onclick = () => {
     board.reset(); history.length = 0; renderMoves(); statusEl.textContent = ''
     fenEl.value = board.chess.fen()
+  }
+
+  const toStudyBtn = container.querySelector('#tostudy')
+  if (toStudyBtn) {
+    toStudyBtn.onclick = async () => {
+      if (!history.length) { container.querySelector('#savemsg').textContent = ' Joue d\'abord quelques coups.'; return }
+      const name = prompt('Nom de l\'etude :', 'Ma combinaison')
+      if (name === null) return
+      const tree = new PgnTree()
+      let cur = tree.rootId
+      const c = new Chess()
+      for (const san of history) { const m = c.move(san); cur = tree.addMove(cur, m, c.fen()) }
+      try {
+        const study = await createStudy({ name: name || 'Ma combinaison', color: 'white' })
+        await saveStudy(study.id, { name: name || 'Ma combinaison', color: 'white', tree: tree.toJSON() })
+        navigate('#/etude/' + study.id)
+      } catch (e) { container.querySelector('#savemsg').textContent = ' Erreur : ' + e.message }
+    }
   }
 
   updateStatus(board.chess)

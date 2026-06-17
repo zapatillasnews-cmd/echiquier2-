@@ -31,6 +31,17 @@ export function currentBoardTheme() {
   return localStorage.getItem('boardTheme') || 'bois'
 }
 
+// --- Mode jour / nuit (chrome de l'app) ---
+export function currentAppMode() { return localStorage.getItem('appMode') || 'dark' }
+export function applyAppMode(mode) {
+  document.documentElement.setAttribute('data-theme', mode === 'light' ? 'light' : 'dark')
+  localStorage.setItem('appMode', mode === 'light' ? 'light' : 'dark')
+  return mode
+}
+export function toggleAppMode() {
+  return applyAppMode(currentAppMode() === 'dark' ? 'light' : 'dark')
+}
+
 // Applique un theme globalement via des variables CSS sur :root.
 export function applyBoardTheme(id) {
   const t = getTheme(id)

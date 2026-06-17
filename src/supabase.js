@@ -29,6 +29,12 @@ export async function signOut() {
   return supabase.auth.signOut()
 }
 
+export async function changePassword(newPassword) {
+  if (!supabase) throw new Error('Supabase non configure')
+  const { error } = await supabase.auth.updateUser({ password: newPassword })
+  if (error) throw error
+}
+
 export function onAuthChange(cb) {
   if (!supabase) return { unsubscribe() {} }
   const { data } = supabase.auth.onAuthStateChange((_e, session) => cb(session?.user ?? null))

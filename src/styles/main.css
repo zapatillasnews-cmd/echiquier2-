@@ -16,6 +16,19 @@
   --radius: 14px;
 }
 
+/* Mode clair (jour) */
+:root[data-theme="light"] {
+  --bg: #f6f8fa;
+  --bg-soft: #ffffff;
+  --bg-card: #ffffff;
+  --border: #d0d7de;
+  --text: #1f2328;
+  --text-dim: #656d76;
+  --accent: #1f6feb;
+  --accent-2: #1a7f37;
+  --danger: #cf222e;
+}
+
 * { box-sizing: border-box; }
 
 body {
@@ -38,6 +51,7 @@ body {
 }
 .topbar .brand { font-weight: 800; font-size: 18px; margin-right: 8px; letter-spacing: .3px; }
 .topbar .brand span { color: var(--accent); }
+.menu { display: flex; align-items: center; gap: 8px; flex: 1; }
 .topbar nav { display: flex; gap: 4px; flex: 1; flex-wrap: wrap; }
 .topbar a {
   color: var(--text-dim); text-decoration: none; padding: 7px 12px;
@@ -45,7 +59,25 @@ body {
 }
 .topbar a:hover { background: var(--bg-card); color: var(--text); }
 .topbar a.active { background: var(--accent); color: #fff; }
-.topbar .user { font-size: 13px; color: var(--text-dim); }
+.topbar .user { font-size: 13px; color: var(--text-dim); display: flex; align-items: center; gap: 6px; }
+.topbar .email { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.menu-toggle { display: none; background: transparent; border: none; color: var(--text); font-size: 24px; cursor: pointer; padding: 4px 8px; }
+
+@media (max-width: 760px) {
+  .menu-toggle { display: block; margin-left: auto; }
+  .topbar { flex-wrap: nowrap; }
+  .menu {
+    display: none; position: absolute; top: 100%; left: 0; right: 0;
+    flex-direction: column; align-items: stretch; gap: 0;
+    background: var(--bg-soft); border-bottom: 1px solid var(--border);
+    padding: 8px; z-index: 20;
+  }
+  .menu.open { display: flex; }
+  .topbar nav { flex-direction: column; align-items: stretch; flex: none; gap: 2px; }
+  .topbar nav a { display: block; padding: 12px; }
+  .topbar .user { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+  .topbar .email { max-width: 100%; flex: 1; }
+}
 
 main { flex: 1; padding: 20px 16px 60px; max-width: 1100px; width: 100%; margin: 0 auto; }
 
@@ -170,3 +202,12 @@ label { display: block; font-size: 13px; color: var(--text-dim); margin: 12px 0 
 .theme-swatch.active { border-color: var(--accent); }
 .swatch-board { width: 100%; aspect-ratio: 1/1; border-radius: 8px; background-size: 100% 100%; }
 .swatch-label { font-size: 13px; font-weight: 600; }
+.settings-board { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start; margin-top: 12px; }
+.settings-board .board-wrap { flex: 0 0 auto; width: 280px; max-width: 70vw; }
+.settings-board .theme-grid { flex: 1; min-width: 220px; margin-top: 0; }
+
+/* ---------- Problemes : explication ---------- */
+.explanation {
+  margin-top: 10px; padding: 10px 12px; background: var(--bg-soft);
+  border: 1px solid var(--border); border-radius: 10px; font-size: 14px; line-height: 1.5;
+}
