@@ -1,7 +1,7 @@
 import './styles/main.css'
 import { getUser, signOut, onAuthChange, isSupabaseConfigured } from './supabase.js'
 import { applyBoardTheme, currentBoardTheme, applyAppMode, currentAppMode, toggleAppMode } from './ui/themes.js'
-import { renderHome } from './views/home.js'
+import { renderCoursesHome, renderCourse, renderCourseStep } from './views/courses.js'
 import { renderPlay } from './views/play.js'
 import { renderGames, renderImport, renderGameView } from './views/games.js'
 import { renderStudies, renderStudyEditor } from './views/studies.js'
@@ -100,7 +100,13 @@ async function router() {
   }
 
   if (hash.startsWith('#/login')) return renderAuth(view, { onSignedIn: () => navigate('#/accueil') })
-  if (hash.startsWith('#/accueil')) return renderHome(view, navigate)
+  if (hash.startsWith('#/cours/')) {
+    const parts = hash.split('/')        // ['#','cours','italienne'] ou [...,'0']
+    const cid = parts[2]
+    if (parts[3] !== undefined && parts[3] !== '') { cleanup = renderCourseStep(view, cid, parseInt(parts[3], 10), navigate); return }
+    return renderCourse(view, cid, navigate)
+  }
+  if (hash.startsWith('#/accueil')) return renderCoursesHome(view, navigate)
   if (hash.startsWith('#/jouer')) { cleanup = renderPlay(view, navigate); return }
   if (hash.startsWith('#/import')) return renderImport(view, navigate)
   if (hash.startsWith('#/partie/')) { cleanup = await renderGameView(view, hash.split('/')[2], navigate); return }
@@ -115,7 +121,7 @@ async function router() {
   if (hash.startsWith('#/parties')) return renderGames(view, navigate)
   if (hash.startsWith('#/reglages')) { cleanup = await renderSettings(view); return }
   // defaut
-  return renderHome(view, navigate)
+  return renderCoursesHome(view, navigate)
 }
 
 async function start() {
