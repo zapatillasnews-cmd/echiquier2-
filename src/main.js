@@ -1,7 +1,11 @@
 import './styles/main.css'
 import { getUser, signOut, onAuthChange, isSupabaseConfigured } from './supabase.js'
+import { applyBoardTheme, currentBoardTheme } from './ui/themes.js'
 import { renderPlay } from './views/play.js'
 import { renderGames, renderImport, renderGameView } from './views/games.js'
+import { renderStudies, renderStudyEditor } from './views/studies.js'
+import { renderMinigamesHub, renderCoordTrainer, renderKnightVision } from './views/minigames.js'
+import { renderSettings } from './views/settings.js'
 import { renderAuth } from './views/auth.js'
 
 const app = document.getElementById('app')
@@ -14,8 +18,11 @@ function navigate(hash) {
 }
 
 const NAV = [
-  { hash: '#/parties', label: 'Mes parties', auth: true },
-  { hash: '#/jouer', label: 'Jouer', auth: false }
+  { hash: '#/parties', label: 'Parties', auth: true },
+  { hash: '#/etudes', label: 'Etudes', auth: true },
+  { hash: '#/jouer', label: 'Jouer', auth: false },
+  { hash: '#/minijeux', label: 'Mini-jeux', auth: false },
+  { hash: '#/reglages', label: 'Reglages', auth: false }
 ]
 
 function renderShell(activeHash) {
@@ -58,7 +65,8 @@ async function router() {
   const view = renderShell(hash)
 
   // Routes protegees (necessitent une connexion quand Supabase est configure)
-  const protectedRoute = hash.startsWith('#/parties') || hash.startsWith('#/import') || hash.startsWith('#/partie')
+  const protectedRoute = hash.startsWith('#/parties') || hash.startsWith('#/import') ||
+    hash.startsWith('#/partie') || hash.startsWith('#/etude')
   if (isSupabaseConfigured && protectedRoute && !currentUser) {
     return renderAuth(view, { onSignedIn: () => navigate('#/parties') })
   }
@@ -76,12 +84,32 @@ async function router() {
     const id = hash.split('/')[2]
     cleanup = await renderGameView(view, id, navigate); return
   }
+  if (hash.startsWith('#/etude/')) {
+    const id = hash.split('/')[2]
+    cleanup = await renderStudyEditor(view, id, navigate); return
+  }
+  if (hash.startsWith('#/etudes')) {
+    return renderStudies(view, navigate)
+  }
+  if (hash.startsWith('#/minijeux/coordonnees')) {
+    cleanup = renderCoordTrainer(view, navigate); return
+  }
+  if (hash.startsWith('#/minijeux/cavalier')) {
+    cleanup = renderKnightVision(view, navigate); return
+  }
+  if (hash.startsWith('#/minijeux')) {
+    return renderMinigamesHub(view, navigate)
+  }
+  if (hash.startsWith('#/reglages')) {
+    return renderSettings(view)
+  }
   // defaut
   if (isSupabaseConfigured) return renderGames(view, navigate)
   cleanup = renderPlay(view)
 }
 
 async function start() {
+  applyBoardTheme(currentBoardTheme())
   currentUser = await getUser()
   onAuthChange((user) => { currentUser = user; router() })
   window.addEventListener('hashchange', router)

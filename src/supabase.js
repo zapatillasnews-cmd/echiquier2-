@@ -67,3 +67,47 @@ export async function deleteGame(id) {
   const { error } = await supabase.from('games').delete().eq('id', id)
   if (error) throw error
 }
+
+// --- Acces aux etudes (arbres de coups) ---
+export async function listStudies() {
+  const { data, error } = await supabase
+    .from('studies')
+    .select('id, name, color, updated_at')
+    .order('updated_at', { ascending: false })
+  if (error) throw error
+  return data
+}
+
+export async function getStudy(id) {
+  const { data, error } = await supabase.from('studies').select('*').eq('id', id).single()
+  if (error) throw error
+  return data
+}
+
+export async function createStudy({ name, color = 'white' }) {
+  const user = await getUser()
+  if (!user) throw new Error('Non connecte')
+  const { data, error } = await supabase
+    .from('studies')
+    .insert({ user_id: user.id, name, color, tree: {} })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function saveStudy(id, { name, color, tree }) {
+  const { data, error } = await supabase
+    .from('studies')
+    .update({ name, color, tree, updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteStudy(id) {
+  const { error } = await supabase.from('studies').delete().eq('id', id)
+  if (error) throw error
+}

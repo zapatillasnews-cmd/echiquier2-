@@ -110,3 +110,63 @@ label { display: block; font-size: 13px; color: var(--text-dim); margin: 12px 0 
 @media (max-width: 760px) {
   .board-layout { grid-template-columns: 1fr; }
 }
+
+/* ---------- Theme d'echiquier (override chessground) ---------- */
+.cg-wrap cg-board {
+  background-image: var(--board-image) !important;
+  background-size: 100% 100% !important;
+  background-color: var(--board-light) !important;
+}
+
+/* ---------- Etudes : arbre de coups ---------- */
+.title-input {
+  font-size: 20px; font-weight: 800; background: transparent; border: none;
+  border-bottom: 1px solid var(--border); border-radius: 0; padding: 4px 2px; width: auto; flex: 1; min-width: 160px;
+}
+.select {
+  background: var(--bg); color: var(--text); border: 1px solid var(--border);
+  border-radius: 10px; padding: 9px 10px; font-size: 14px;
+}
+.tree { font-size: 15px; line-height: 1.9; max-height: 360px; overflow-y: auto; }
+.tree .mv { padding: 1px 5px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+.tree .mv:hover { background: var(--bg-soft); }
+.tree .mv.current { background: var(--accent); color: #fff; }
+.tree .num { color: var(--text-dim); margin-left: 4px; }
+.tree .variation {
+  display: inline; color: var(--text-dim); font-size: 13.5px;
+  border-left: 2px solid var(--border); margin-left: 2px; padding-left: 4px;
+}
+.tree .variation .mv { font-weight: 500; }
+.line-name {
+  display: inline-block; background: var(--accent-2); color: #fff; font-size: 11px;
+  font-weight: 700; padding: 1px 6px; border-radius: 6px; margin: 0 4px; vertical-align: middle;
+}
+
+/* ---------- Mini-jeux : grille ---------- */
+.grid-board {
+  display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr);
+  width: 100%; aspect-ratio: 1/1; border-radius: 8px; overflow: hidden;
+}
+.gsq {
+  border: none; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center;
+  font-size: clamp(20px, 6vw, 40px); line-height: 1; color: #111; transition: filter .1s;
+}
+.gsq.l { background: var(--board-light); }
+.gsq.d { background: var(--board-dark); }
+.gsq:hover { filter: brightness(1.12); }
+.gsq.knight { color: #111; cursor: default; }
+.gsq.target-ok { box-shadow: inset 0 0 0 4px var(--accent-2); }
+.flash-ok { box-shadow: inset 0 0 0 5px var(--accent-2) !important; }
+.flash-bad { box-shadow: inset 0 0 0 5px var(--danger) !important; }
+.big-target { font-size: 56px; font-weight: 800; letter-spacing: 2px; margin: 6px 0; }
+.stat { font-size: 24px; font-weight: 800; }
+
+/* ---------- Reglages : themes ---------- */
+.theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; margin-top: 12px; }
+.theme-swatch {
+  background: var(--bg); border: 2px solid var(--border); border-radius: 12px; padding: 8px;
+  cursor: pointer; display: flex; flex-direction: column; gap: 8px; align-items: center; color: var(--text);
+}
+.theme-swatch.active { border-color: var(--accent); }
+.swatch-board { width: 100%; aspect-ratio: 1/1; border-radius: 8px; background-size: 100% 100%; }
+.swatch-label { font-size: 13px; font-weight: 600; }

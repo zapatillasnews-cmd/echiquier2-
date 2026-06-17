@@ -2,7 +2,7 @@ import { Chessground } from 'chessground'
 import { Chess } from 'chess.js'
 
 // Calcule les coups legaux au format attendu par chessground : Map(from -> [to...])
-function legalDests(chess) {
+export function legalDests(chess) {
   const dests = new Map()
   for (const m of chess.moves({ verbose: true })) {
     if (!dests.has(m.from)) dests.set(m.from, [])
@@ -100,6 +100,39 @@ export class GameViewer {
   prev() { return this.goto(this.index - 1) }
   first() { return this.goto(0) }
   last() { return this.goto(this.moves.length - 1) }
+  flip() { this.cg.toggleOrientation() }
+  destroy() { this.cg.destroy() }
+}
+
+// Plateau interactif pilote de l'exterieur : l'appelant gere l'etat (arbre de
+// coups). On lui fournit une FEN ; il appelle onMove(orig, dest) a chaque coup.
+export class InteractiveBoard {
+  constructor(el, { orientation = 'white', onMove } = {}) {
+    this.onMove = onMove
+    this.cg = Chessground(el, {
+      orientation,
+      movable: { free: false, color: 'white', dests: new Map(), showDests: true },
+      highlight: { lastMove: true, check: true },
+      animation: { enabled: true, duration: 150 },
+      events: { move: (orig, dest) => this.onMove?.(orig, dest) }
+    })
+  }
+
+  // Place une position. lastMove = [from, to] pour la surbrillance (optionnel).
+  setFen(fen, lastMove) {
+    const chess = new Chess(fen)
+    const color = turnColor(chess)
+    const inCheck = chess.inCheck?.() ?? false
+    this.cg.set({
+      fen,
+      turnColor: color,
+      lastMove: lastMove && lastMove[0] ? lastMove : undefined,
+      check: inCheck ? color : false,
+      movable: { color, dests: legalDests(chess) }
+    })
+  }
+
+  setOrientation(o) { this.cg.set({ orientation: o }) }
   flip() { this.cg.toggleOrientation() }
   destroy() { this.cg.destroy() }
 }
