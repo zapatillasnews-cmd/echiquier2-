@@ -71,7 +71,7 @@ function renderShell(activeHash) {
   // Boite utilisateur
   const userbox = app.querySelector('#userbox')
   if (!isSupabaseConfigured) {
-    userbox.innerHTML = '<span class="muted">mode local</span>'
+    userbox.innerHTML = ''
   } else if (currentUser) {
     userbox.innerHTML = `<span class="email">${currentUser.email}</span> <a href="#" id="logout">Déconnexion</a>`
     userbox.querySelector('#logout').onclick = async (e) => { e.preventDefault(); await signOut(); navigate('#/accueil') }
