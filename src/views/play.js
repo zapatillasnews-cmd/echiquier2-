@@ -38,6 +38,12 @@ export function renderPlay(container, navigate) {
           <button class="btn" id="ouverture">💾 Ouverture</button>
         </div>
 
+        <div class="save-bar" id="savebar" hidden>
+          <input id="opname" placeholder="Nom…" />
+          <button class="btn btn-sm" id="opsave">Enregistrer</button>
+          <button class="btn secondary btn-sm" id="opcancel">✕</button>
+        </div>
+
         <div class="replay-bar" id="replaybar" hidden>
           <button class="btn secondary btn-sm" id="first">|◀</button>
           <button class="btn secondary btn-sm" id="prev">◀</button>
@@ -183,7 +189,7 @@ export function renderPlay(container, navigate) {
   function toggleLib(open) {
     libOpen = open ?? !libOpen
     $('#libcard').hidden = !libOpen
-    if (libOpen) renderLib()
+    if (libOpen) { renderLib(); $('#libcard').scrollIntoView({ behavior: 'smooth', block: 'nearest' }) }
   }
 
   // --- actions ---
@@ -199,21 +205,28 @@ export function renderPlay(container, navigate) {
     if (mode === 'replay') currentId = tree.rootId   // on rejoue depuis le debut
     refresh()
   }
-  $('#variante').onclick = () => {
-    if (tree.isRoot(currentId)) { return }
-    const name = prompt('Nom de cette variante :', tree.get(currentId).name || 'Ma variante')
-    if (name === null) return
-    tree.setName(currentId, name); refresh()
+  // Saisie du nom EN LIGNE (le prompt() natif est bloque dans les PWA mobiles).
+  let saveMode = null
+  const saveBar = $('#savebar'), opName = $('#opname')
+  function openSave(m, def) { saveMode = m; opName.value = def; saveBar.hidden = false; opName.focus() }
+  $('#opcancel').onclick = () => { saveBar.hidden = true; saveMode = null }
+  $('#opsave').onclick = () => {
+    const name = opName.value.trim()
+    if (!name) { opName.focus(); return }
+    if (saveMode === 'opening') {
+      const list = loadLib()
+      list.unshift({ id: 'o' + Date.now(), name, tree: tree.toJSON() })
+      saveLib(list)
+      statusEl.textContent = '✓ « ' + name + ' » enregistrée dans 📂 Mes ouvertures'
+    } else if (saveMode === 'variante') {
+      tree.setName(currentId, name); refresh()
+    }
+    saveBar.hidden = true; saveMode = null
   }
-  $('#ouverture').onclick = () => {
-    if (!hasMoves()) return
-    const name = prompt("Nom de l'ouverture :", 'Mon ouverture')
-    if (name === null) return
-    const list = loadLib()
-    list.unshift({ id: 'o' + Date.now(), name: name || 'Mon ouverture', tree: tree.toJSON() })
-    saveLib(list)
-    statusEl.textContent = '✓ Ouverture enregistrée dans 📂 Mes ouvertures'
-  }
+  opName.onkeydown = (e) => { if (e.key === 'Enter') $('#opsave').click() }
+
+  $('#variante').onclick = () => { if (!tree.isRoot(currentId)) openSave('variante', tree.get(currentId).name || 'Ma variante') }
+  $('#ouverture').onclick = () => { if (hasMoves()) openSave('opening', 'Mon ouverture') }
 
   $('#first').onclick = () => go(tree.rootId)
   $('#prev').onclick = () => { const n = tree.get(currentId); if (n.parentId) go(n.parentId) }

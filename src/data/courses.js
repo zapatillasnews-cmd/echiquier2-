@@ -639,5 +639,112 @@ export const COURSES = [
         ]
       }
     ]
+  },
+  {
+    id: 'gambitroi', name: 'Le Gambit du Roi', eco: 'C30', icon: '🔥',
+    cover: '#d9544c', dark: '#b03830', side: 'white',
+    tagline: 'Le gambit romantique le plus célèbre',
+    steps: [
+      {
+        title: 'Le gambit romantique', place: '1.e4 e5 2.f4',
+        intro: "On offre immédiatement le pion f pour ouvrir la colonne f, déloger e5 et bâtir un centre écrasant avec d4. Risqué, spectaculaire, adoré de Morphy à Spassky.",
+        line: [
+          { san: 'e4' }, { san: 'e5' },
+          { san: 'f4', note: 'Le Gambit du Roi : un pion contre l\'initiative et le centre.' }
+        ]
+      },
+      {
+        title: 'Le Gambit accepté (Kieseritzky)', place: '2...exf4 3.Cf3 g5 4.h4 g4 5.Ce5',
+        intro: "Les Noirs gardent le pion avec ...g5, mais 4.h4 ! frappe la chaîne. Après ...g4 5.Ce5, on obtient la fameuse variante Kieseritzky : un chaos théorique étudié depuis 200 ans.",
+        line: [
+          { san: 'e4' }, { san: 'e5' }, { san: 'f4' },
+          { san: 'exf4', note: 'On accepte le pion.' },
+          { san: 'Nf3', note: 'On empêche ...Dh4+ et on développe.' },
+          { san: 'g5', note: 'Les Noirs s\'accrochent au pion f4.' },
+          { san: 'h4', note: 'On attaque la chaîne de pions noire.' },
+          { san: 'g4' },
+          { san: 'Ne5', note: 'Le cavalier saute au centre : variante Kieseritzky.' }
+        ]
+      },
+      {
+        title: 'Le Gambit refusé (fou)', place: '2...Fc5 3.Cf3 d6',
+        intro: "Le plus sûr pour les Noirs : 2...Fc5 refuse le pion et cloue indirectement f4 (gare à ...Dh4+ si les Blancs jouent fxe5 imprudemment). Jeu sain et équilibré.",
+        line: [
+          { san: 'e4' }, { san: 'e5' }, { san: 'f4' },
+          { san: 'Bc5', note: 'On refuse le gambit ; le fou surveille g1 (et empêche le roque facile).' },
+          { san: 'Nf3' },
+          { san: 'd6', note: 'On soutient e5 et on développe tranquillement.' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'pirc', name: 'La Défense Pirc', eco: 'B07', icon: '🏹',
+    cover: '#6a9c8a', dark: '#4c7c6a', side: 'black',
+    tagline: 'Hypermoderne : on rend le centre pour mieux frapper',
+    steps: [
+      {
+        title: 'La structure Pirc', place: '1.e4 d6 2.d4 Cf6 3.Cc3 g6',
+        intro: "Comme l'Est-Indienne mais contre 1.e4 : les Noirs fianchettent et laissent les Blancs prendre le centre, qu'ils mineront ensuite avec ...e5 ou ...c5 et le fou g7.",
+        line: [
+          { san: 'e4' }, { san: 'd6' }, { san: 'd4' },
+          { san: 'Nf6', note: 'On attaque e4 et on prépare le fianchetto.' },
+          { san: 'Nc3' },
+          { san: 'g6', note: 'Le plan Pirc : fianchetto et contre-jeu.' }
+        ]
+      },
+      {
+        title: "L'attaque autrichienne", place: '4.f4 Fg7 5.Cf3 O-O',
+        intro: "La réponse la plus agressive des Blancs : f4 vise une attaque directe à l'aile roi (e5, f5). Les Noirs roquent vite et préparent ...c5 ou ...e5 pour casser le centre au bon moment.",
+        line: [
+          { san: 'e4' }, { san: 'd6' }, { san: 'd4' }, { san: 'Nf6' }, { san: 'Nc3' }, { san: 'g6' },
+          { san: 'f4', note: "L'attaque autrichienne : centre massif et ambitions de mat." },
+          { san: 'Bg7' }, { san: 'Nf3' },
+          { san: 'O-O', note: 'Roi à l\'abri ; les Noirs viseront ...c5 contre le centre.' }
+        ]
+      },
+      {
+        title: 'Le système classique', place: '4.Cf3 Fg7 5.Fe2 O-O',
+        intro: "Développement sobre des Blancs (Cf3, Fe2, O-O). Les Noirs égalisent en jouant ...c6 et ...Cbd7, ou ...e5, dans un schéma souple et solide.",
+        line: [
+          { san: 'e4' }, { san: 'd6' }, { san: 'd4' }, { san: 'Nf6' }, { san: 'Nc3' }, { san: 'g6' },
+          { san: 'Nf3' }, { san: 'Bg7' }, { san: 'Be2' },
+          { san: 'O-O', note: 'Position type ; suivra ...c6/...Cbd7 ou ...e5.' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'nimzo', name: 'La Nimzo-Indienne', eco: 'E20', icon: '🧠',
+    cover: '#8a7cab', dark: '#6a5c8c', side: 'black',
+    tagline: "L'une des défenses les plus respectées contre 1.d4",
+    steps: [
+      {
+        title: 'Le clouage 3...Fb4', place: '1.d4 Cf6 2.c4 e6 3.Cc3 Fb4',
+        intro: "Les Noirs clouent le cavalier c3 pour contrôler la case e4 sans bouger leurs pions. Idée stratégique profonde : souvent ...Fxc3 donnera aux Blancs des pions doublés à assiéger.",
+        line: [
+          { san: 'd4' }, { san: 'Nf6' }, { san: 'c4' }, { san: 'e6' }, { san: 'Nc3' },
+          { san: 'Bb4', note: 'La Nimzo : on cloue c3 et on lutte pour e4.' }
+        ]
+      },
+      {
+        title: 'La variante Rubinstein 4.e3', place: '4.e3 O-O',
+        intro: "Le coup le plus joué : 4.e3 développe sobrement. Les Noirs roquent et choisiront entre ...c5, ...d5, ...b6 selon le plan. Flexibilité maximale des deux côtés.",
+        line: [
+          { san: 'd4' }, { san: 'Nf6' }, { san: 'c4' }, { san: 'e6' }, { san: 'Nc3' }, { san: 'Bb4' },
+          { san: 'e3', note: 'La variante Rubinstein, solide et flexible.' },
+          { san: 'O-O', note: 'On roque ; suivra ...d5, ...c5 ou ...b6 selon les Blancs.' }
+        ]
+      },
+      {
+        title: 'La variante classique 4.Dc2', place: '4.Dc2 O-O',
+        intro: "4.Dc2 vise à reprendre en c3 avec la dame (sans pions doublés) et garde la paire de fous. Les Noirs ripostent par ...d5 ou ...c5 et un développement rapide.",
+        line: [
+          { san: 'd4' }, { san: 'Nf6' }, { san: 'c4' }, { san: 'e6' }, { san: 'Nc3' }, { san: 'Bb4' },
+          { san: 'Qc2', note: 'On prépare à reprendre en c3 sans abîmer sa structure.' },
+          { san: 'O-O', note: 'Les Noirs développent et frapperont le centre.' }
+        ]
+      }
+    ]
   }
 ]

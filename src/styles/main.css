@@ -344,6 +344,8 @@ label { display: block; font-size: 0.85rem; color: var(--ink-soft); font-weight:
 /* =================== Jouer : barres d'action =================== */
 .play-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 12px; }
 .replay-bar { display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+.save-bar { display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+.save-bar input { max-width: 220px; }
 .replay-bar .counter { font-weight: 800; min-width: 86px; text-align: center; }
 .opening-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .opening-open {
