@@ -1,0 +1,68 @@
+import { Board } from '../ui/board.js'
+
+// Jeu libre : on joue les deux camps, coups legaux, historique cliquable.
+export function renderPlay(container) {
+  container.innerHTML = `
+    <h1>Echiquier</h1>
+    <div class="board-layout">
+      <div class="board-wrap"><div class="cg-wrap" id="board"></div></div>
+      <div class="sidebar">
+        <div class="card">
+          <div class="row" style="justify-content:space-between">
+            <h2 style="margin:0">Coups</h2>
+            <div class="row">
+              <button class="btn secondary" id="flip">Retourner</button>
+              <button class="btn secondary" id="reset">Reset</button>
+            </div>
+          </div>
+          <div class="movelist" id="moves"></div>
+          <p class="muted" id="status" style="margin-top:12px"></p>
+        </div>
+        <div class="card">
+          <h2>FEN</h2>
+          <input id="fen" readonly />
+        </div>
+      </div>
+    </div>`
+
+  const movesEl = container.querySelector('#moves')
+  const statusEl = container.querySelector('#status')
+  const fenEl = container.querySelector('#fen')
+  const history = []
+
+  const board = new Board(container.querySelector('#board'), {
+    onMove: (move, chess) => {
+      history.push(move.san)
+      renderMoves()
+      updateStatus(chess)
+      fenEl.value = chess.fen()
+    }
+  })
+  fenEl.value = board.chess.fen()
+
+  function renderMoves() {
+    let html = ''
+    for (let i = 0; i < history.length; i++) {
+      if (i % 2 === 0) html += `<span class="num">${i / 2 + 1}.</span>`
+      html += `<span class="mv">${history[i]}</span>`
+    }
+    movesEl.innerHTML = html
+  }
+
+  function updateStatus(chess) {
+    if (chess.isCheckmate()) statusEl.textContent = 'Echec et mat.'
+    else if (chess.isStalemate()) statusEl.textContent = 'Pat.'
+    else if (chess.isDraw()) statusEl.textContent = 'Nulle.'
+    else if (chess.inCheck()) statusEl.textContent = 'Echec !'
+    else statusEl.textContent = (chess.turn() === 'w' ? 'Trait aux blancs' : 'Trait aux noirs')
+  }
+
+  container.querySelector('#flip').onclick = () => board.flip()
+  container.querySelector('#reset').onclick = () => {
+    board.reset(); history.length = 0; renderMoves(); statusEl.textContent = ''
+    fenEl.value = board.chess.fen()
+  }
+
+  updateStatus(board.chess)
+  return () => board.destroy()
+}
